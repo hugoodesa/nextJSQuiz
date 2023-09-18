@@ -1,0 +1,12 @@
+.time {
+  display: flex;
+  padding: 15px;
+  background-color: rgb(80, 49, 75);
+  font-weight: bold;
+  color: rgb(202, 198, 198);
+  align-items: center;
+  justify-content: center;
+  height: 10vh;
+  width: 5vw;
+  border-radius: 100%;
+}
