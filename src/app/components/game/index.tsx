@@ -75,7 +75,7 @@ const Game = () => {
 
   const redirectToScore = () => {
     const { howManyCorrects, howManyQuestions } = checkResults();
-    redirect(`score/${howManyQuestions}/${howManyCorrects}`);
+    redirect(`pages/score/${howManyQuestions}/${howManyCorrects}`);
   };
 
   return (

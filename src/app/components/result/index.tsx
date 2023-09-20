@@ -18,7 +18,7 @@ const GenericCircle = ({ children, backgroundColor }: Props) => {
 
 const RestartButton = () => {
   return (
-    <Link className={styles.restart} href={`/pages/home`}>
+    <Link className={styles.restart} href={`/`}>
       BACK
     </Link>
   );
