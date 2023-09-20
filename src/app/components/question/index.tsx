@@ -1,33 +1,24 @@
 "use client";
 
-import QuestionCard from "../questionCard";
-import { useState } from "react";
+import OptionCard from "../questionCard";
 
-const Question = ({ question }: { question: Question }) => {
-  const [optionSelected, setOptionSelected] = useState<boolean>(false);
+type Props = {
+  questionSelectOption: (option: Option) => void;
+  question: Question;
+};
 
-  const itsCorrectQuestion = (option: string) => {
-    return question.correctAnswer === option;
-  };
-
-  const highLightTheCorrectOne = () => {
-    
-  };
-
+const Question = ({ question, questionSelectOption }: Props) => {
   return (
     <>
-      <h1>{question.question.text}</h1>
+      <h1>{question.question}</h1>
 
       {question.options.map((option, index) => {
-        const isCorrect = itsCorrectQuestion(option);
-
         return (
-          <QuestionCard
-            isCorrect={isCorrect}
+          <OptionCard
+            question={question}
             key={index}
             option={option}
-            index={index}
-            setOptionSelected={setOptionSelected}
+            questionSelectOption={questionSelectOption}
           />
         );
       })}

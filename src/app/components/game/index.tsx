@@ -1,62 +1,94 @@
 "use client";
-import { questionDTO } from "@/app/api/quiz/route";
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Question from "../question";
 import styles from "./index.module.css";
 import Timer from "../timer";
+import { redirect } from "next/navigation";
 
 const getQuestions = async () => {
   return await axios.get("http://localhost:3000/api/quiz");
 };
 
 const Game = () => {
-  const initialState: Question = {
-    id: 0,
-    correctAnswer: "",
-    incorrectAnswers: [],
-    options: [],
-    question: {
-      text: "",
-    },
-  };
-
-  const [currentQuestion, setCurrentQuestion] =
-    useState<Question>(initialState);
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [questionNumber, setQuestionNumber] = useState<number>(0);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<Question>({
+    id: "",
+    options: [],
+    question: "",
+    isAnswered: false,
+    optionSelected: null,
+  });
 
   useEffect(() => {
     const loadQuestions = async () => {
       const { data } = await getQuestions();
-      const loadedQuestions = questionDTO(data);
-      setQuestions(loadedQuestions);
-      setCurrentQuestion(loadedQuestions[0]);
+      setQuestions(data);
+      setCurrentQuestion(data[0]);
     };
 
     loadQuestions();
   }, []);
 
-  const isLastQuestion = (): boolean => {
+  const getNextQuestion = () => {
+    const position = questionNumber + 1;
+    setQuestionNumber(position);
+    setCurrentQuestion(questions[position]);
+  };
+
+  const questionSelectOption = (optionSelected: Option) => {
+    setCurrentQuestion({
+      ...currentQuestion,
+      isAnswered: true,
+      optionSelected,
+    });
+
+    const changedQuestion = {
+      ...currentQuestion,
+      optionSelected,
+      isAnswered: true,
+    };
+    const newStateQuestions = [...questions];
+    newStateQuestions[questionNumber] = changedQuestion;
+    setQuestions([...newStateQuestions]);
+  };
+
+  const hasNext = () => {
     return questions.length > questionNumber + 1;
   };
 
-  const handleQuestion = () => {
-    if (isLastQuestion()) {
-      const newQuestionNumber = questionNumber + 1;
-      const question = questions[newQuestionNumber];
-      setQuestionNumber(newQuestionNumber);
-      setCurrentQuestion(question);
-    }
+  const checkResults = () => {
+    const howManyQuestions = questions.length;
+    const howManyCorrects = questions.filter(
+      (question) =>
+        question.optionSelected?.isCorrect &&
+        question.optionSelected?.isCorrect !== null
+    ).length;
+
+    return {
+      howManyQuestions,
+      howManyCorrects,
+    };
+  };
+
+  const redirectToScore = () => {
+    const { howManyCorrects, howManyQuestions } = checkResults();
+    redirect(`score/${howManyQuestions}/${howManyCorrects}`);
   };
 
   return (
     <div className={styles.game}>
       <Timer
-        itsLastQuestion={isLastQuestion()}
-        handleQuestion={handleQuestion}
+        hasNext={hasNext()}
+        handleQuestion={getNextQuestion}
+        redirectToScore={redirectToScore}
       />
-      <Question question={currentQuestion} />
+      <Question
+        questionSelectOption={questionSelectOption}
+        question={currentQuestion}
+      />
     </div>
   );
 };

@@ -1,8 +1,11 @@
+"use client";
+import Link from "next/link";
 import styles from "./index.module.css";
+import { redirect } from "next/navigation";
 
 type Props = {
-  children: JSX.Element | JSX.Element[] | string | string[];
-  backgroundColor: "red" | "blue" | "yellow";
+  children: JSX.Element | JSX.Element[] | string | number | string[];
+  backgroundColor: string;
 };
 
 const GenericCircle = ({ children, backgroundColor }: Props) => {
@@ -14,26 +17,58 @@ const GenericCircle = ({ children, backgroundColor }: Props) => {
 };
 
 const RestartButton = () => {
-  return <div className={styles.restart}>Restart Test</div>;
-};
-
-const Percentage = ({ number }: { number: string }) => {
-  return <GenericCircle backgroundColor="red">{number}%</GenericCircle>;
-};
-
-const QuestionsNumber = ({ number }: { number: string }) => {
-  return <GenericCircle backgroundColor="yellow">{number}</GenericCircle>;
-};
-
-const AnswersCorrect = ({ number }: { number: string }) => {
-  return <GenericCircle backgroundColor="blue">{number}</GenericCircle>;
-};
-
-export default function Result() {
   return (
-    <>
-      <Percentage number="2" />
+    <Link className={styles.restart} href={`/pages/home`}>
+      BACK
+    </Link>
+  );
+};
+
+const Percentage = ({ number }: { number: number }) => {
+  return (
+    <div className={styles.frame}>
+      <h1>Percentage</h1>
+      <GenericCircle backgroundColor="#c0392b">{number}</GenericCircle>
+    </div>
+  );
+};
+
+const QuestionsNumber = ({ number }: { number: number }) => {
+  return (
+    <div className={styles.frame}>
+      <h1>Questions Number</h1>
+      <GenericCircle backgroundColor="#e67e22">{number}</GenericCircle>
+    </div>
+  );
+};
+
+const AnswersCorrect = ({ number }: { number: number }) => {
+  return (
+    <div className={styles.frame}>
+      <h1>Answers Correct</h1>
+      <GenericCircle backgroundColor="#3498db">{number}</GenericCircle>
+    </div>
+  );
+};
+
+export default function Result({
+  corrects,
+  questionsNumber,
+}: {
+  corrects: number;
+  questionsNumber: number;
+}) {
+  return (
+    <div className={styles.result}>
+      <h1>Score</h1>
+      <div className={styles.indicators}>
+        <QuestionsNumber number={questionsNumber} />
+        <AnswersCorrect number={corrects} />
+        <Percentage
+          number={Number(((corrects / questionsNumber) * 100).toFixed(2))}
+        />
+      </div>
       <RestartButton />
-    </>
+    </div>
   );
 }

@@ -1,9 +1,14 @@
+type Option = {
+  value: string;
+  marked: boolean;
+  isCorrect: boolean;
+  letter: string;
+};
+
 type Question = {
-  id: number;
-  correctAnswer: string;
-  question: {
-    text: string;
-  };
-  incorrectAnswers: string[];
-  options: string[];
+  id: string;
+  question: string;
+  options: Option[];
+  isAnswered: boolean;
+  optionSelected: Option | null;
 };

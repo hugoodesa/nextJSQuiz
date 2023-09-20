@@ -1,71 +1,76 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./index.module.css";
 
 type PropsCard = {
   children?: JSX.Element | JSX.Element[];
-  handleCardSelect: () => void;
-  style: string;
 };
 
-type QuestionPropsCard = {
-  option: String;
-  index: number;
-  isCorrect: boolean;
-  setOptionSelected: Dispatch<SetStateAction<boolean>>;
+type OptionCardProp = {
+  option: Option;
+  question: Question;
+  questionSelectOption: (option: Option) => void;
 };
 
-const LetterOption = ({ position }: { position: number }) => {
-  const letters: string[] = ["A", "B", "C", "D"];
-
-  return <div className={styles.letterOption}>{letters[position]}</div>;
-};
-
-const Option = ({ option }: { option: String }) => {
-  return <div className={styles.question}>{option}</div>;
-};
-
-const Card = ({ style, children, handleCardSelect }: PropsCard) => {
-  return (
-    <div onClick={handleCardSelect} className={style}>
-      {children}
-    </div>
-  );
-};
-
-export default function QuestionCard({
+export default function OptionCard({
   option,
-  index,
-  isCorrect,
-  setOptionSelected,
-}: QuestionPropsCard) {
-  const [cardSelected, setCardSelected] = useState<boolean>(false);
+  question,
+  questionSelectOption,
+}: OptionCardProp) {
+  const [cardStyle, setCardStyle] = useState<string>(styles.card);
 
-  const handleCardSelect = () => {
-    setCardSelected(!cardSelected);
+  const LetterOption = ({ letter }: { letter: string }) => {
+    return <div className={styles.letterOption}>{letter}</div>;
   };
 
-  const getCardStyle = (): string => {
-    if (isCorrect && cardSelected) {
-      return styles.cardCorrect;
-    } else if (!isCorrect && cardSelected) {
-      return styles.cardWrong;
+  const Option = ({ option }: { option: String }) => {
+    return <div className={styles.question}>{option}</div>;
+  };
+
+  const Card = ({ children }: PropsCard) => {
+    return (
+      <div onClick={selectOption} className={cardStyle}>
+        {children}
+      </div>
+    );
+  };
+
+  const handleStyle = (option: Option) => {
+    if (option.isCorrect && option.marked) {
+      setCardStyle(styles.cardCorrect);
+    } else if (!option.isCorrect && option.marked) {
+      setCardStyle(styles.cardWrong);
     } else {
-      return styles.card;
+      setCardStyle(styles.card);
+    }
+  };
+
+  const selectOption = () => {
+    if (!question.isAnswered) {
+      const optionNewState = { ...option, marked: true };
+      questionSelectOption(optionNewState);
+      handleStyle(optionNewState);
     }
   };
 
   useEffect(() => {
-    setCardSelected(false);
-    setOptionSelected(true);
-  }, [option]);
+    setCardStyle(styles.card);
+  }, [question.options]);
+
+  useEffect(() => {
+    if (question.isAnswered && option.isCorrect) {
+      setTimeout(() => {
+        setCardStyle(styles.cardCorrect);
+      }, 100);
+    }
+  }, [question.isAnswered]);
 
   return (
     <>
-      <Card style={getCardStyle()} handleCardSelect={handleCardSelect}>
-        <LetterOption position={index} />
-        <Option option={option} />
+      <Card>
+        <LetterOption letter={option.letter} />
+        <Option option={option.value} />
       </Card>
     </>
   );

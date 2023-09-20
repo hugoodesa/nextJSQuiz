@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 import styles from "./index.module.css";
 
 type props = {
+  hasNext: boolean;
   handleQuestion: () => void;
-  itsLastQuestion: boolean;
+  redirectToScore: () => void;
 };
 
-export default function Timer({ itsLastQuestion, handleQuestion }: props) {
+export default function Timer({
+  hasNext,
+  handleQuestion,
+  redirectToScore,
+}: props) {
   const [seconds, setSeconds] = useState<number>(10);
 
   useEffect(() => {
@@ -20,9 +25,13 @@ export default function Timer({ itsLastQuestion, handleQuestion }: props) {
 
     return () => {
       clearInterval(timer);
-      if (seconds == 1 && itsLastQuestion) {
+      if (seconds == 1 && hasNext) {
         handleQuestion();
         setSeconds(10);
+      }
+
+      if (!hasNext && seconds == 1) {
+        redirectToScore();
       }
     };
   }, [seconds]);
