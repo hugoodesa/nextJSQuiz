@@ -6,9 +6,10 @@ import Question from "../question";
 import styles from "./index.module.css";
 import Timer from "../timer";
 import { redirect } from "next/navigation";
+import { GET } from "@/app/api/quiz/route";
 
 const getQuestions = async () => {
-  return await axios.get("http://localhost:3000/api/quiz");
+  return await GET();
 };
 
 const Game = () => {
@@ -24,9 +25,10 @@ const Game = () => {
 
   useEffect(() => {
     const loadQuestions = async () => {
-      const { data } = await getQuestions();
-      setQuestions(data);
-      setCurrentQuestion(data[0]);
+      const data = (await getQuestions()).json();
+      const reponse = await data;
+      setQuestions(reponse);
+      setCurrentQuestion(reponse[0]);
     };
 
     loadQuestions();
